@@ -44,9 +44,15 @@ public class RaycastController : MonoBehaviour
     /// </summary>
     float m_verticalRayGaps;
 
-    BoxCollider2D m_collider;
-    RectCorners m_corners;
-    CollisionInfo m_collisionInfo;
+    protected BoxCollider2D m_collider;
+    protected CollisionInfo m_collisionInfo;
+
+    #region get-set
+    public CollisionInfo CollisionInfo
+    {
+        get { return m_collisionInfo; }
+    }
+    #endregion
 
     protected virtual void Awake()
     {
@@ -73,14 +79,24 @@ public class RaycastController : MonoBehaviour
         m_verticalRayGaps = m_verticalRayCount > 1 ? width / (m_verticalRayCount - 1) : width;
     }
 
+    public void Move(Vector2 movement)
+    {
+        m_collisionInfo.Reset(movement);
+
+        HorizontalCollisions(ref movement);
+        VerticalCollisions(ref movement);
+
+        transform.Translate(movement);
+    }
+
     void HorizontalCollisions(ref Vector2 movement)
     {
-        int dirX = m_collisionInfo.m_faceDir;
+        float dirX = Mathf.Sign(movement.x);
         float rayLength = Mathf.Abs(movement.x) + c_skinWidth;
 
         for(int i = 0; i < m_horizontalRayCount; i++)
         {
-            Vector2 origin = (dirX == c_left ? m_corners.m_BL : m_corners.m_BR);
+            Vector2 origin = GetHorizontalBorder(dirX);
             origin += Vector2.up * (m_horizontalRayGaps * i);
 
             Vector2 rayDir = Vector2.right * dirX;
@@ -103,59 +119,64 @@ public class RaycastController : MonoBehaviour
 
     void VerticalCollisions(ref Vector2 movement)
     {
+        if (movement.y == 0)
+            return;
+
         float dirY = Mathf.Sign(movement.y);
         float rayLength = Mathf.Abs(movement.y) + c_skinWidth;
 
         for(int i = 0; i < m_verticalRayCount; i++)
         {
-            Vector2 origin = (dirY == c_bottom ? m_corners.m_BL : m_corners.m_TL);
+            Vector2 origin = GetVerticalBorder(dirY);
             origin += Vector2.right * (m_verticalRayGaps * i + movement.x);
 
             Vector2 rayDir = Vector2.up * dirY;
 
             Debug.DrawRay(origin, rayDir, Color.red);
             RaycastHit2D hit = Physics2D.Raycast(origin, rayDir, rayLength, m_collisionMask);
-            if(hit)
+            if (hit)
             {
-                if (hit.distance == 0)
-                    continue;
-
                 movement.y = (hit.distance - c_skinWidth) * dirY;
                 rayLength = hit.distance;
 
-                m_collisionInfo.m_blow = (dirY == c_bottom);
+                m_collisionInfo.m_below = (dirY == c_bottom);
                 m_collisionInfo.m_above = (dirY == c_top);
             }
         }
     }
 
-    #region 内部
-    /// <summary>
-    /// 矩形的四个端点
-    /// </summary>
-    struct RectCorners
+    Vector2 GetHorizontalBorder(float dir)
     {
-        public Vector2 m_BL, m_BR, m_TL, m_TR;
+        Vector2 s = m_collider.bounds.size / 2;
+        Vector2 pos = transform.position;
 
-        public void Update(Bounds b)
-        {
-            m_BL = new Vector2(b.min.x, b.min.y);
-            m_BR = new Vector2(b.max.x, b.min.y);
-            m_TL = new Vector2(b.min.x, b.max.y);
-            m_TR = new Vector2(b.max.x, b.max.y);
-        }
+        if (dir == c_left)
+            return new Vector2(pos.x - s.x, pos.y - s.y);
+        else
+            return new Vector2(pos.x + s.x, pos.y - s.y);
     }
 
-    struct CollisionInfo
+    Vector2 GetVerticalBorder(float dir)
     {
-        public bool m_above, m_blow, m_left, m_right;
-        public Vector2 m_lastMovement;
-        public int m_faceDir;
+        Vector2 s = m_collider.bounds.size / 2;
+        Vector2 pos = transform.position;
 
-        public void Reset()
-        {
-            m_above = m_blow = m_left = m_right = false;
-        }
+        if (dir == c_bottom)
+            return new Vector2(pos.x - s.x, pos.y - s.y);
+        else
+            return new Vector2(pos.x - s.x, pos.y + s.y);
     }
-    #endregion
+}
+
+public struct CollisionInfo
+{
+    public bool m_above, m_below, m_left, m_right;
+    public Vector2 m_originMovement;
+    public int m_faceDir;
+
+    public void Reset(Vector2 originMovement)
+    {
+        m_above = m_below = m_left = m_right = false;
+        m_originMovement = originMovement;
+    }
 }
