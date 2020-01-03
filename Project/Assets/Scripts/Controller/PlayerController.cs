@@ -10,6 +10,7 @@ public class PlayerController : RaycastController
 
     float m_velocityXSmooth;
     Vector2 m_velocity;
+    Vector2 m_inputData;
 
     readonly JumpAbility m_jumpAbility = new JumpAbility();
     readonly ClimbWallAbility m_climbWallAbility = new ClimbWallAbility();
@@ -20,25 +21,29 @@ public class PlayerController : RaycastController
         get { return m_velocity; }
         set { m_velocity = value; }
     }
+
+    public Vector2 InputData
+    {
+        get { return m_inputData; }
+    }
     #endregion
 
     void Update()
     {
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
-        Vector2 input = new Vector2(horizontal, vertical);
-        CalcVelocityByInput(input);
+        m_inputData = new Vector2(horizontal, vertical);
 
-        m_jumpAbility.Update(this, input);
-        m_climbWallAbility.Update(this, input);
-        
+        CalcVelocityByInput(m_inputData);
+
+        m_jumpAbility.Update(this, m_inputData);
+        m_climbWallAbility.Update(this, m_inputData);
+
         Move(m_velocity * Time.deltaTime);
 
         //上或下碰到障碍时，重置竖直方向速度
         if(m_collisionInfo.m_above || m_collisionInfo.m_below)
-        {
             m_velocity.y = 0;
-        }
     }
 
     void CalcVelocityByInput(Vector2 input)

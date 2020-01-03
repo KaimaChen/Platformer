@@ -11,47 +11,47 @@ public class RaycastController : MonoBehaviour
     /// <summary>
     /// 射线的间隔
     /// </summary>
-    const float c_rayGaps = 0.25f;
+    protected const float c_rayGaps = 0.25f;
 
     /// <summary>
     /// 皮肤厚度，会影响实际的射线长度
     /// </summary>
-    const float c_skinWidth = 0.015f;
+    protected const float c_skinWidth = 0.015f;
 
     /// <summary>
     /// 会与哪些层的物体碰撞
     /// </summary>
     [SerializeField]
-    LayerMask m_collisionMask;
+    protected LayerMask m_collisionMask;
 
     /// <summary>
     /// 水平射线个数
     /// </summary>
-    int m_horizontalRayCount;
+    protected int m_horizontalRayCount;
 
     /// <summary>
     /// 实际的水平射线间隔
     /// </summary>
-    float m_horizontalRayGaps;
+    protected float m_horizontalRayGaps;
 
     /// <summary>
     /// 竖直射线个数
     /// </summary>
-    int m_verticalRayCount;
+    protected int m_verticalRayCount;
 
     /// <summary>
     /// 实际的竖直射线间隔
     /// </summary>
-    float m_verticalRayGaps;
+    protected float m_verticalRayGaps;
 
     protected BoxCollider2D m_collider;
+
     protected CollisionInfo m_collisionInfo;
 
     #region get-set
-    public CollisionInfo CollisionInfo
-    {
-        get { return m_collisionInfo; }
-    }
+    public BoxCollider2D Collider { get { return m_collider; } }
+
+    public CollisionInfo CollisionInfo { get { return m_collisionInfo; } }
     #endregion
 
     protected virtual void Awake()
@@ -145,7 +145,7 @@ public class RaycastController : MonoBehaviour
         }
     }
 
-    Vector2 GetHorizontalBorder(float dir)
+    protected Vector2 GetHorizontalBorder(float dir)
     {
         Vector2 s = m_collider.bounds.size / 2;
         Vector2 pos = transform.position;
@@ -156,7 +156,7 @@ public class RaycastController : MonoBehaviour
             return new Vector2(pos.x + s.x, pos.y - s.y);
     }
 
-    Vector2 GetVerticalBorder(float dir)
+    protected Vector2 GetVerticalBorder(float dir)
     {
         Vector2 s = m_collider.bounds.size / 2;
         Vector2 pos = transform.position;

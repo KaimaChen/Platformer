@@ -11,92 +11,110 @@ public class WaypointsMotor : MonoBehaviour
     /// false：反过来继续
     /// </summary>
     [SerializeField]
-    private bool m_Loop;
+    private bool m_loop;
 
     /// <summary>
     /// 移动速度
     /// </summary>
     [SerializeField]
-    private int m_Speed;
+    private int m_speed;
 
     /// <summary>
     /// 当前要移动到的目标点索引
     /// </summary>
-    private int m_Index;
+    private int m_index;
 
     /// <summary>
     /// 是否通过递减索引来找下一个目标
     /// </summary>
-    private bool m_Descend;
+    private bool m_descend;
 
-    private Waypoints m_Waypoints;
+    /// <summary>
+    /// 是否手动触发更新
+    /// </summary>
+    private bool m_triggerUpdate;
+
+    private Waypoints m_waypoints;
+
+    #region get-set
+    public bool TriggerUpdate { set { m_triggerUpdate = value; } }
+    #endregion
 
     void Start()
     {
-        m_Waypoints = GetComponent<Waypoints>();
+        m_waypoints = GetComponent<Waypoints>();
     }
 
     void Update()
     {
-        if (m_Waypoints.Count <= 0)
-            return;
+        if(!m_triggerUpdate)
+            transform.position = Move();
+    }
+
+    public Vector2 Move()
+    {
+        if (m_waypoints.Count <= 0)
+            return Vector2.zero;
 
         //TODO: 这种实现会导致端点处不是顺滑的
+        Vector2 result;
         Vector2 curtPos = transform.position;
-        Vector2 targetPos = m_Waypoints.GetPoint(m_Index);
+        Vector2 targetPos = m_waypoints.GetPoint(m_index);
         Vector2 toTarget = targetPos - curtPos;
 
         float targetDist = toTarget.magnitude;
-        float moveDist = m_Speed * Time.deltaTime;
+        float moveDist = m_speed * Time.deltaTime;
 
-        if(moveDist >= targetDist)
+        if (moveDist >= targetDist)
         {
-            transform.position = targetPos;
+            result = targetPos;
             UpdateIndex();
         }
         else
         {
             Vector2 move = toTarget.normalized * moveDist;
-            transform.position += new Vector3(move.x, move.y);
+            result = transform.position + new Vector3(move.x, move.y);
         }
+
+        return result;
     }
 
     void UpdateIndex()
     {
         //TODO：又丑又长，改一下
-        if(m_Descend)
+        if(m_descend)
         {
-            m_Index--;
-            if(m_Index < 0)
+            m_index--;
+            if(m_index < 0)
             {
-                if (m_Loop)
+                if (m_loop)
                 {
-                    m_Index = m_Waypoints.Count - 1;
+                    m_index = m_waypoints.Count - 1;
                 }
                 else
                 {
-                    m_Index = 1;
-                    m_Descend = false;
+                    m_index = 1;
+                    m_descend = false;
                 }
             }
         }
         else
         {
-            m_Index++;
-            if(m_Index >= m_Waypoints.Count)
+            m_index++;
+            if(m_index >= m_waypoints.Count)
             {
-                if(m_Loop)
+                if(m_loop)
                 {
-                    m_Index = 0;
+                    m_index = 0;
                 }
                 else
                 {
-                    m_Index -= 2;
-                    m_Descend = true;
+                    m_index -= 2;
+                    m_descend = true;
                 }
             }
         }
 
-        m_Index = Mathf.Clamp(m_Index, 0, m_Waypoints.Count - 1);
+        m_index = Mathf.Clamp(m_index, 0, m_waypoints.Count - 1);
     }
 }
