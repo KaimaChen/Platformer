@@ -12,4 +12,8 @@ public static class Defines
     public const int c_right = 1;
     public const int c_bottom = -1;
     public const int c_top = 1;
+
+    #region Tags
+    public const string c_tagOneWayPlatform = "OneWayPlatform";
+    #endregion
 }

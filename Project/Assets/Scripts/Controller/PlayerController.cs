@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class PlayerController : RaycastController
+public class PlayerController : Raycaster
 {
     [SerializeField]
     float m_speed = 6f;

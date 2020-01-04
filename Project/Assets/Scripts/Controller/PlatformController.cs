@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-//TODO
 [RequireComponent(typeof(WaypointsMotor))]
-public class PlatformController : RaycastController
+public class PlatformController : Raycaster
 {
     WaypointsMotor m_waypointsMotor;
 
@@ -140,8 +139,8 @@ public class PlatformController : RaycastController
             var p = passengers[i];
             if(p.m_moveBefore == moveBefore)
             {
-                var controller = p.m_transform.GetComponent<RaycastController>();
-                controller.Move(p.m_velocity);
+                var controller = p.m_transform.GetComponent<Raycaster>();
+                controller.Move(p.m_velocity, p.m_isStandingOnPlatform);
             }
         }
     }

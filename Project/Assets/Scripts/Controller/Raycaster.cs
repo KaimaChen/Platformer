@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [RequireComponent(typeof(BoxCollider2D))]
-public class RaycastController : MonoBehaviour
+public class Raycaster : MonoBehaviour
 {
     const int c_right = 1;
     const int c_left = -1;
@@ -17,6 +17,11 @@ public class RaycastController : MonoBehaviour
     /// 皮肤厚度，会影响实际的射线长度
     /// </summary>
     protected const float c_skinWidth = 0.015f;
+
+    /// <summary>
+    /// 隔多久重置m_isFallThroughOneWayPlatform状态
+    /// </summary>
+    const float c_resetThroughTime = 0.5f;
 
     /// <summary>
     /// 会与哪些层的物体碰撞
@@ -43,6 +48,11 @@ public class RaycastController : MonoBehaviour
     /// 实际的竖直射线间隔
     /// </summary>
     protected float m_verticalRayGaps;
+
+    /// <summary>
+    /// 是否正在向下穿越单向平台
+    /// </summary>
+    protected bool m_isFallThroughOneWayPlatform;
 
     protected BoxCollider2D m_collider;
 
@@ -79,7 +89,7 @@ public class RaycastController : MonoBehaviour
         m_verticalRayGaps = m_verticalRayCount > 1 ? width / (m_verticalRayCount - 1) : width;
     }
 
-    public void Move(Vector2 movement)
+    public void Move(Vector2 movement, bool isOnPlatform = false)
     {
         m_collisionInfo.Reset(movement);
 
@@ -87,6 +97,9 @@ public class RaycastController : MonoBehaviour
         VerticalCollisions(ref movement);
 
         transform.Translate(movement);
+
+        if (isOnPlatform)
+            m_collisionInfo.m_below = true;
     }
 
     void HorizontalCollisions(ref Vector2 movement)
@@ -136,6 +149,16 @@ public class RaycastController : MonoBehaviour
             RaycastHit2D hit = Physics2D.Raycast(origin, rayDir, rayLength, m_collisionMask);
             if (hit)
             {
+                //特殊处理单向平台
+                if (hit.transform.CompareTag(Defines.c_tagOneWayPlatform))
+                {
+                    if (dirY == c_top) //单向平台不会挡住向上跳
+                        continue;
+
+                    if (m_isFallThroughOneWayPlatform)
+                        continue;
+                }
+
                 movement.y = (hit.distance - c_skinWidth) * dirY;
                 rayLength = hit.distance;
 
@@ -143,6 +166,18 @@ public class RaycastController : MonoBehaviour
                 m_collisionInfo.m_above = (dirY == c_top);
             }
         }
+    }
+
+    public void FallThrough()
+    {
+        m_isFallThroughOneWayPlatform = true;
+
+        Invoke("ResetData", c_resetThroughTime); //TODO: 感觉这样用时间来定时重置会有问题，比如玩家动作就是快，那么第二次跳平台就会发现跳不上去
+    }
+
+    void ResetData()
+    {
+        m_isFallThroughOneWayPlatform = false;
     }
 
     protected Vector2 GetHorizontalBorder(float dir)

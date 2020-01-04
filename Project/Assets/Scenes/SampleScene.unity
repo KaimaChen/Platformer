@@ -235,7 +235,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 235658091}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: MovingPlatforms
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -405,6 +405,7 @@ MonoBehaviour:
   m_target: {fileID: 1311688727}
   m_offset: {x: 0, y: 0}
   m_focusAreaSize: {x: 3, y: 5}
+  m_lookAheadDistance: 4
   m_horizontalSmoothTime: 0.5
   m_verticalSmoothTime: 0.1
 --- !u!20 &519420031
@@ -480,7 +481,7 @@ GameObject:
   - component: {fileID: 968668708}
   m_Layer: 8
   m_Name: mp1
-  m_TagString: Untagged
+  m_TagString: OneWayPlatform
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -523,7 +524,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 5ce88f59f1544ca438a68aec30ae9fac, type: 3}
-  m_Color: {r: 0.9160466, g: 1, b: 0, a: 1}
+  m_Color: {r: 0, g: 0.7848017, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -541,8 +542,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 968668702}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.96, y: -3.28, z: 0}
-  m_LocalScale: {x: 48.845, y: 6.13848, z: 1}
+  m_LocalPosition: {x: -2.8, y: -2.23, z: 0}
+  m_LocalScale: {x: 48.845, y: 9.443855, z: 1}
   m_Children: []
   m_Father: {fileID: 235658091}
   m_RootOrder: 0
@@ -626,7 +627,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1123882409}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Obstacles
   m_TagString: Untagged
   m_Icon: {fileID: 0}

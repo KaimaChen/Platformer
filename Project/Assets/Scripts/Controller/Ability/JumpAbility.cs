@@ -9,7 +9,7 @@ public class JumpAbility : BaseAbility
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            OnJumpKeyDown(controller);
+            OnJumpKeyDown(controller, input);
         }
         else if (Input.GetKeyUp(KeyCode.Space))
         {
@@ -17,14 +17,21 @@ public class JumpAbility : BaseAbility
         }
     }
 
-    private void OnJumpKeyDown(PlayerController controller)
+    private void OnJumpKeyDown(PlayerController controller, Vector2 input)
     {
         Vector2 v = controller.Velocity;
 
         if (controller.CollisionInfo.m_below)
         {
-            v.y = m_maxJumpVelocity;
-            controller.Velocity = v;
+            if(input.y < 0)
+            {
+                controller.FallThrough();
+            }
+            else
+            {
+                v.y = m_maxJumpVelocity;
+                controller.Velocity = v;
+            }
         }
     }
 
