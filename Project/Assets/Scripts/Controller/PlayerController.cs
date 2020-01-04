@@ -12,8 +12,8 @@ public class PlayerController : Raycaster
     Vector2 m_velocity;
     Vector2 m_inputData;
 
-    readonly JumpAbility m_jumpAbility = new JumpAbility();
-    readonly ClimbWallAbility m_climbWallAbility = new ClimbWallAbility();
+    JumpAbility m_jumpAbility;
+    ClimbWallAbility m_climbWallAbility;
 
     #region get-set
     public Vector2 Velocity
@@ -27,6 +27,14 @@ public class PlayerController : Raycaster
         get { return m_inputData; }
     }
     #endregion
+
+    protected override void Start()
+    {
+        base.Start();
+
+        m_jumpAbility = new JumpAbility(this, 2);
+        m_climbWallAbility = new ClimbWallAbility();
+    }
 
     void Update()
     {

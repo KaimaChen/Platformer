@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 
 [RequireComponent(typeof(BoxCollider2D))]
 public class Raycaster : MonoBehaviour
@@ -53,6 +54,10 @@ public class Raycaster : MonoBehaviour
 
     protected CollisionInfo m_collisionInfo;
 
+    #region 回调
+    public Action m_belowCollisionCB;
+    #endregion
+
     #region get-set
     public BoxCollider2D Collider { get { return m_collider; } }
 
@@ -98,7 +103,10 @@ public class Raycaster : MonoBehaviour
         transform.Translate(movement);
 
         if (isOnPlatform)
+        {
             m_collisionInfo.m_below = true;
+            m_belowCollisionCB?.Invoke();
+        }
     }
 
     void HorizontalCollisions(ref Vector2 movement)
@@ -163,6 +171,9 @@ public class Raycaster : MonoBehaviour
 
                 m_collisionInfo.m_below = (dirY == Defines.c_bottom);
                 m_collisionInfo.m_above = (dirY == Defines.c_top);
+
+                if (m_collisionInfo.m_below)
+                    m_belowCollisionCB?.Invoke();
             }
         }
     }
