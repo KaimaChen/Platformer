@@ -561,8 +561,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Points:
-  - {x: -2.8440428, y: -3.5916464}
-  - {x: -2.436266, y: 9.8022375}
+  - {x: -1.8325357, y: -3.913373}
+  - {x: -3.732648, y: -0.2105918}
 --- !u!114 &968668706
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -576,7 +576,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_loop: 0
-  m_speed: 0
+  m_speed: 1
 --- !u!61 &968668707
 BoxCollider2D:
   m_ObjectHideFlags: 0

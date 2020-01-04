@@ -3,15 +3,10 @@
 [RequireComponent(typeof(BoxCollider2D))]
 public class Raycaster : MonoBehaviour
 {
-    const int c_right = 1;
-    const int c_left = -1;
-    const int c_bottom = -1;
-    const int c_top = 1;
-
     /// <summary>
-    /// 射线的间隔
+    /// 射线的最少个数
     /// </summary>
-    protected const float c_rayGaps = 0.25f;
+    const int c_minRayCount = 2;
 
     /// <summary>
     /// 皮肤厚度，会影响实际的射线长度
@@ -32,20 +27,20 @@ public class Raycaster : MonoBehaviour
     /// <summary>
     /// 水平射线个数
     /// </summary>
-    protected int m_horizontalRayCount;
+    protected int m_horizontalRayCount = 4;
 
     /// <summary>
-    /// 实际的水平射线间隔
+    /// 水平射线间隔
     /// </summary>
     protected float m_horizontalRayGaps;
 
     /// <summary>
     /// 竖直射线个数
     /// </summary>
-    protected int m_verticalRayCount;
+    protected int m_verticalRayCount = 4;
 
     /// <summary>
-    /// 实际的竖直射线间隔
+    /// 竖直射线间隔
     /// </summary>
     protected float m_verticalRayGaps;
 
@@ -73,7 +68,7 @@ public class Raycaster : MonoBehaviour
     {
         InitRayData();
 
-        m_collisionInfo.m_faceDir = c_right;
+        m_collisionInfo.m_faceDir = Defines.c_right;
     }
 
     void InitRayData()
@@ -82,10 +77,14 @@ public class Raycaster : MonoBehaviour
         float width = bounds.size.x;
         float height = bounds.size.y;
 
-        m_horizontalRayCount = Mathf.RoundToInt(height / c_rayGaps);
+        if (m_horizontalRayCount < c_minRayCount)
+            m_horizontalRayCount = c_minRayCount;
+
         m_horizontalRayGaps = m_horizontalRayCount > 1 ? height / (m_horizontalRayCount - 1) : height;
 
-        m_verticalRayCount = Mathf.RoundToInt(width / c_rayGaps);
+        if (m_verticalRayCount < c_minRayCount)
+            m_verticalRayCount = c_minRayCount;
+
         m_verticalRayGaps = m_verticalRayCount > 1 ? width / (m_verticalRayCount - 1) : width;
     }
 
@@ -124,8 +123,8 @@ public class Raycaster : MonoBehaviour
                 movement.x = (hit.distance - c_skinWidth) * dirX;
                 rayLength = hit.distance;
 
-                m_collisionInfo.m_left = (dirX == c_left);
-                m_collisionInfo.m_right = (dirX == c_right);
+                m_collisionInfo.m_left = (dirX == Defines.c_left);
+                m_collisionInfo.m_right = (dirX == Defines.c_right);
             }
         }
     }
@@ -152,7 +151,7 @@ public class Raycaster : MonoBehaviour
                 //特殊处理单向平台
                 if (hit.transform.CompareTag(Defines.c_tagOneWayPlatform))
                 {
-                    if (dirY == c_top) //单向平台不会挡住向上跳
+                    if (dirY == Defines.c_top) //单向平台不会挡住向上跳
                         continue;
 
                     if (m_isFallThroughOneWayPlatform)
@@ -162,8 +161,8 @@ public class Raycaster : MonoBehaviour
                 movement.y = (hit.distance - c_skinWidth) * dirY;
                 rayLength = hit.distance;
 
-                m_collisionInfo.m_below = (dirY == c_bottom);
-                m_collisionInfo.m_above = (dirY == c_top);
+                m_collisionInfo.m_below = (dirY == Defines.c_bottom);
+                m_collisionInfo.m_above = (dirY == Defines.c_top);
             }
         }
     }
@@ -185,7 +184,7 @@ public class Raycaster : MonoBehaviour
         Vector2 s = m_collider.bounds.size / 2;
         Vector2 pos = transform.position;
 
-        if (dir == c_left)
+        if (dir == Defines.c_left)
             return new Vector2(pos.x - s.x, pos.y - s.y);
         else
             return new Vector2(pos.x + s.x, pos.y - s.y);
@@ -196,7 +195,7 @@ public class Raycaster : MonoBehaviour
         Vector2 s = m_collider.bounds.size / 2;
         Vector2 pos = transform.position;
 
-        if (dir == c_bottom)
+        if (dir == Defines.c_bottom)
             return new Vector2(pos.x - s.x, pos.y - s.y);
         else
             return new Vector2(pos.x - s.x, pos.y + s.y);
