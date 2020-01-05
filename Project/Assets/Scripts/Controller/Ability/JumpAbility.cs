@@ -36,60 +36,64 @@ public class JumpAbility : BaseAbility
     }
     #endregion
 
-    public JumpAbility(PlayerController controller, int maxJumpCount = 1)
+    public JumpAbility(PlayerController owner, int maxJumpCount = 1)
+        : base(owner)
     {
-        controller.m_belowCollisionCB += ResetJumpCount;
+        owner.m_belowCollisionCB += ResetJumpCount;
 
         m_maxJumpCount = maxJumpCount;
         m_remainJumpCount = maxJumpCount;
     }
 
-    public override void Update(PlayerController controller, Vector2 input)
+    public override void Update(Vector2 input)
     {
+        if (!m_owner.IsFree)
+            return;
+
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            OnJumpKeyDown(controller, input);
+            OnJumpKeyDown(input);
         }
         else if (Input.GetKeyUp(KeyCode.Space))
         {
-            OnJumpKeyUp(controller);
+            OnJumpKeyUp();
         }
     }
 
-    private void OnJumpKeyDown(PlayerController controller, Vector2 input)
+    private void OnJumpKeyDown(Vector2 input)
     {
-        if (controller.CollisionInfo.m_below)
+        if (m_owner.CollisionInfo.m_below)
         {
             if(input.y < 0)
-                controller.FallThrough();
+                m_owner.FallThrough();
             else
-                Jump(controller);
+                Jump();
         }
         else
         {
             if(m_remainJumpCount > 0)
-                Jump(controller);
+                Jump();
         }
     }
 
-    private void OnJumpKeyUp(PlayerController controller)
+    private void OnJumpKeyUp()
     {
-        Vector2 v = controller.Velocity;
+        Vector2 v = m_owner.Velocity;
 
         if (v.y > m_minJumpVelocity)
         {
             v.y = m_minJumpVelocity;
-            controller.Velocity = v;
+            m_owner.Velocity = v;
         }
     }
 
-    void Jump(PlayerController controller)
+    void Jump()
     {
         m_remainJumpCount--;
 
-        Vector2 v = controller.Velocity;
+        Vector2 v = m_owner.Velocity;
         v.y = m_maxJumpVelocity;
-        controller.Velocity = v;
+        m_owner.Velocity = v;
     }
 
     void ResetJumpCount()

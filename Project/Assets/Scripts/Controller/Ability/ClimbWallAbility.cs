@@ -27,13 +27,18 @@ public class ClimbWallAbility : BaseAbility
 
     bool m_isSliding;
     int m_wallRelativeDir;
-    
-    public override void Update(PlayerController controller, Vector2 input)
-    {
-        Vector2 v = controller.Velocity;
 
-        m_wallRelativeDir = (controller.CollisionInfo.m_left ? Defines.c_left : Defines.c_right);
-        m_isSliding = IsSliding(controller.CollisionInfo, v);
+    public ClimbWallAbility(PlayerController owner) : base(owner) { }
+
+    public override void Update(Vector2 input)
+    {
+        if (!m_owner.IsFree)
+            return;
+
+        Vector2 v = m_owner.Velocity;
+
+        m_wallRelativeDir = (m_owner.CollisionInfo.m_left ? Defines.c_left : Defines.c_right);
+        m_isSliding = IsSliding(m_owner.CollisionInfo, v);
 
         if(m_isSliding)
             v.y = Mathf.Max(v.y, m_slideMinSpeed);
@@ -50,7 +55,7 @@ public class ClimbWallAbility : BaseAbility
             v.x *= -m_wallRelativeDir;
         }
 
-        controller.Velocity = v;
+        m_owner.Velocity = v;
     }
 
     bool IsSliding(CollisionInfo info, Vector2 velocity)

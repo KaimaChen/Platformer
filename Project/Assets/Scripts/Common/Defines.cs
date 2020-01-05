@@ -17,3 +17,9 @@ public static class Defines
     public const string c_tagOneWayPlatform = "OneWayPlatform";
     #endregion
 }
+
+public enum FaceDir
+{
+    Left,
+    Right,
+}

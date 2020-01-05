@@ -54,6 +54,8 @@ public class Raycaster : MonoBehaviour
 
     protected CollisionInfo m_collisionInfo;
 
+    protected FaceDir m_faceDir;
+
     #region 回调
     public Action m_belowCollisionCB;
     #endregion
@@ -62,18 +64,21 @@ public class Raycaster : MonoBehaviour
     public BoxCollider2D Collider { get { return m_collider; } }
 
     public CollisionInfo CollisionInfo { get { return m_collisionInfo; } }
+
+    public FaceDir FaceDir { get { return m_faceDir; } }
+
+    public bool IsOnGround { get { return m_collisionInfo.m_below; } }
     #endregion
 
     protected virtual void Awake()
     {
         m_collider = GetComponent<BoxCollider2D>();
+        m_faceDir = FaceDir.Right;
     }
 
     protected virtual void Start()
     {
         InitRayData();
-
-        m_collisionInfo.m_faceDir = Defines.c_right;
     }
 
     void InitRayData()
@@ -95,12 +100,17 @@ public class Raycaster : MonoBehaviour
 
     public void Move(Vector2 movement, bool isOnPlatform = false)
     {
-        m_collisionInfo.Reset(movement);
+        m_collisionInfo.Reset();
 
         HorizontalCollisions(ref movement);
         VerticalCollisions(ref movement);
 
         transform.Translate(movement);
+
+        if (movement.x > 0)
+            m_faceDir = FaceDir.Right;
+        else if (movement.x < 0)
+            m_faceDir = FaceDir.Left;
 
         if (isOnPlatform)
         {
@@ -216,12 +226,9 @@ public class Raycaster : MonoBehaviour
 public struct CollisionInfo
 {
     public bool m_above, m_below, m_left, m_right;
-    public Vector2 m_originMovement;
-    public int m_faceDir;
 
-    public void Reset(Vector2 originMovement)
+    public void Reset()
     {
         m_above = m_below = m_left = m_right = false;
-        m_originMovement = originMovement;
     }
 }

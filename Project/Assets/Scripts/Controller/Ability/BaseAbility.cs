@@ -2,5 +2,12 @@
 
 public abstract class BaseAbility
 {
-    public abstract void Update(PlayerController controller, Vector2 input);
+    protected readonly PlayerController m_owner;
+
+    public BaseAbility(PlayerController owner)
+    {
+        m_owner = owner;
+    }
+
+    public abstract void Update(Vector2 input);
 }

@@ -2,18 +2,28 @@
 
 public class PlayerController : Raycaster
 {
+    /// <summary>
+    /// 在地上的加速度
+    /// </summary>
+    const float c_groundAcceration = 0.1f;
+
+    /// <summary>
+    /// 在空中的加速度
+    /// </summary>
+    const float c_airAcceration = 0.1f;
+
     [SerializeField]
     float m_speed = 6f;
-
-    float m_groundAcceration = 0.1f;
-    float m_airAcceration = 0.2f;
 
     float m_velocityXSmooth;
     Vector2 m_velocity;
     Vector2 m_inputData;
 
+    bool m_isFree = true;
+
     JumpAbility m_jumpAbility;
     ClimbWallAbility m_climbWallAbility;
+    DashAbility m_dashAbility;
 
     #region get-set
     public Vector2 Velocity
@@ -26,6 +36,12 @@ public class PlayerController : Raycaster
     {
         get { return m_inputData; }
     }
+
+    public bool IsFree
+    {
+        get { return m_isFree; }
+        set { m_isFree = value; }
+    }
     #endregion
 
     protected override void Start()
@@ -33,7 +49,8 @@ public class PlayerController : Raycaster
         base.Start();
 
         m_jumpAbility = new JumpAbility(this, 2);
-        m_climbWallAbility = new ClimbWallAbility();
+        m_climbWallAbility = new ClimbWallAbility(this);
+        m_dashAbility = new DashAbility(this, 15, 0.4f, 1f);
     }
 
     void Update()
@@ -44,8 +61,9 @@ public class PlayerController : Raycaster
 
         CalcVelocityByInput(m_inputData);
 
-        m_jumpAbility.Update(this, m_inputData);
-        m_climbWallAbility.Update(this, m_inputData);
+        m_jumpAbility.Update(m_inputData);
+        m_climbWallAbility.Update(m_inputData);
+        m_dashAbility.Update(m_inputData);
 
         Move(m_velocity * Time.deltaTime);
 
@@ -56,8 +74,11 @@ public class PlayerController : Raycaster
 
     void CalcVelocityByInput(Vector2 input)
     {
+        if (!m_isFree)
+            return;
+
         float targetX = input.x * m_speed;
-        float acceration = (m_collisionInfo.m_below ? m_groundAcceration : m_airAcceration);
+        float acceration = (m_collisionInfo.m_below ? c_groundAcceration : c_airAcceration);
         m_velocity.x = Mathf.SmoothDamp(m_velocity.x, targetX, ref m_velocityXSmooth, acceration);
 
         m_velocity.y += Defines.c_gravity * Time.deltaTime;
