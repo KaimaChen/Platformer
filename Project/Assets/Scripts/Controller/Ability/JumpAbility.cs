@@ -45,6 +45,18 @@ public class JumpAbility : BaseAbility
         m_remainJumpCount = maxJumpCount;
     }
 
+    public override void OnGUI()
+    {
+        base.OnGUI();
+
+        GUIStyle style = new GUIStyle()
+        {
+            fontSize = 40
+        };
+
+        GUILayout.Label($"跳跃次数:{m_remainJumpCount}", style);
+    }
+
     protected override bool CanUpdate()
     {
         return m_owner.State != PlayerState.Dash &&

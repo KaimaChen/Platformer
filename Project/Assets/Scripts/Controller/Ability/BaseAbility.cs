@@ -20,4 +20,6 @@ public abstract class BaseAbility
     protected abstract bool CanUpdate();
 
     protected abstract void UpdateImpl(Vector2 input);
+
+    public virtual void OnGUI() { }
 }

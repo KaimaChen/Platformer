@@ -70,6 +70,13 @@ public class PlayerController : Raycaster
             m_velocity.y = 0;
     }
 
+    private void OnGUI()
+    {
+        m_jumpAbility.OnGUI();
+        m_climbWallAbility.OnGUI();
+        m_dashAbility.OnGUI();
+    }
+
     void CalcVelocityByInput(Vector2 input)
     {
         float targetX = input.x * m_speed;
