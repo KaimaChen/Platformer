@@ -19,7 +19,7 @@ public class PlayerController : Raycaster
     Vector2 m_velocity;
     Vector2 m_inputData;
 
-    bool m_isFree = true;
+    PlayerState m_state = PlayerState.Normal;
 
     JumpAbility m_jumpAbility;
     ClimbWallAbility m_climbWallAbility;
@@ -37,10 +37,10 @@ public class PlayerController : Raycaster
         get { return m_inputData; }
     }
 
-    public bool IsFree
+    public PlayerState State
     {
-        get { return m_isFree; }
-        set { m_isFree = value; }
+        get { return m_state; }
+        set { m_state = value; }
     }
     #endregion
 
@@ -55,9 +55,7 @@ public class PlayerController : Raycaster
 
     void Update()
     {
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
-        m_inputData = new Vector2(horizontal, vertical);
+        m_inputData = InputBuffer.Instance.Move;
 
         CalcVelocityByInput(m_inputData);
 
@@ -74,9 +72,6 @@ public class PlayerController : Raycaster
 
     void CalcVelocityByInput(Vector2 input)
     {
-        if (!m_isFree)
-            return;
-
         float targetX = input.x * m_speed;
         float acceration = (m_collisionInfo.m_below ? c_groundAcceration : c_airAcceration);
         m_velocity.x = Mathf.SmoothDamp(m_velocity.x, targetX, ref m_velocityXSmooth, acceration);

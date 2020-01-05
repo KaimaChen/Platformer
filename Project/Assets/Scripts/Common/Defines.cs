@@ -23,3 +23,18 @@ public enum FaceDir
     Left,
     Right,
 }
+
+public enum PlayerState
+{
+    Normal,
+    ClimbWall,
+    Dash,
+}
+
+public enum KeyState
+{
+    None,
+    Down,
+    Pressing,
+    Up,
+}

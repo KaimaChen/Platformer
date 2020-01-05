@@ -40,20 +40,20 @@ public class DashAbility : BaseAbility
         m_cd = cd;
     }
 
-    public override void Update(Vector2 input)
+    protected override bool CanUpdate()
+    {
+        return true;
+    }
+
+    protected override void UpdateImpl(Vector2 input)
     {
         if(CanStartDash())
             StartDash();
 
         if (IsDashing())
-        {
-            m_owner.IsFree = false;
             Dash();
-        }
         else
-        {
             EndDash();
-        }
     }
 
     bool CanStartDash()
@@ -62,7 +62,7 @@ public class DashAbility : BaseAbility
 
         if (IsDashing()) return false;
 
-        if (!Input.GetKeyDown(KeyCode.LeftControl)) return false;
+        if (!InputBuffer.Instance.DashDown) return false;
 
         return true;
     }
@@ -72,6 +72,7 @@ public class DashAbility : BaseAbility
         m_dashEndTime = Time.time + m_duration;
         m_cdEndTime = Time.time + m_cd;
         m_dir = m_owner.FaceDir == FaceDir.Right ? 1 : -1;
+        m_owner.State = PlayerState.Dash;
     }
 
     void Dash()
@@ -81,10 +82,10 @@ public class DashAbility : BaseAbility
 
     void EndDash()
     {
-        if (m_owner.IsFree)
+        if (m_owner.State != PlayerState.Dash)
             return;
 
-        m_owner.IsFree = true;
+        m_owner.State = PlayerState.Normal;
         m_owner.Velocity = Vector2.zero;
 
         m_dashEndTime = 0;
@@ -92,6 +93,8 @@ public class DashAbility : BaseAbility
 
     bool IsDashing()
     {
+        if (m_owner.State != PlayerState.Dash) return false;
+
         return m_dashEndTime > Time.time;
     }
 

@@ -45,16 +45,19 @@ public class JumpAbility : BaseAbility
         m_remainJumpCount = maxJumpCount;
     }
 
-    public override void Update(Vector2 input)
+    protected override bool CanUpdate()
     {
-        if (!m_owner.IsFree)
-            return;
+        return m_owner.State != PlayerState.Dash &&
+                    m_owner.State != PlayerState.ClimbWall;
+    }
 
-        if (Input.GetKeyDown(KeyCode.Space))
+    protected override void UpdateImpl(Vector2 input)
+    {
+        if (InputBuffer.Instance.JumpDown)
         {
             OnJumpKeyDown(input);
         }
-        else if (Input.GetKeyUp(KeyCode.Space))
+        else if (InputBuffer.Instance.JumpUp)
         {
             OnJumpKeyUp();
         }
@@ -62,7 +65,7 @@ public class JumpAbility : BaseAbility
 
     private void OnJumpKeyDown(Vector2 input)
     {
-        if (m_owner.CollisionInfo.m_below)
+        if (m_owner.IsOnGround)
         {
             if(input.y < 0)
                 m_owner.FallThrough();
@@ -87,6 +90,13 @@ public class JumpAbility : BaseAbility
         }
     }
 
+    void FallThrough()
+    {
+        m_owner.FallThrough();
+
+        InputBuffer.Instance.ResetJump();
+    }
+
     void Jump()
     {
         m_remainJumpCount--;
@@ -94,6 +104,8 @@ public class JumpAbility : BaseAbility
         Vector2 v = m_owner.Velocity;
         v.y = m_maxJumpVelocity;
         m_owner.Velocity = v;
+
+        InputBuffer.Instance.ResetJump();
     }
 
     void ResetJumpCount()

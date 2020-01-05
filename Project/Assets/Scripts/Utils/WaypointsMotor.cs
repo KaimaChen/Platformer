@@ -11,13 +11,13 @@ public class WaypointsMotor : MonoBehaviour
     /// false：反过来继续
     /// </summary>
     [SerializeField]
-    private bool m_loop;
+    private bool m_loop = false;
 
     /// <summary>
     /// 移动速度
     /// </summary>
     [SerializeField]
-    private int m_speed;
+    private int m_speed = 1;
 
     /// <summary>
     /// 当前要移动到的目标点索引

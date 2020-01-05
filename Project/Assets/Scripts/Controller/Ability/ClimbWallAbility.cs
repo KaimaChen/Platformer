@@ -30,20 +30,30 @@ public class ClimbWallAbility : BaseAbility
 
     public ClimbWallAbility(PlayerController owner) : base(owner) { }
 
-    public override void Update(Vector2 input)
+    protected override bool CanUpdate()
     {
-        if (!m_owner.IsFree)
-            return;
+        return m_owner.State != PlayerState.Dash;
+    }
 
+    protected override void UpdateImpl(Vector2 input)
+    {
         Vector2 v = m_owner.Velocity;
 
         m_wallRelativeDir = (m_owner.CollisionInfo.m_left ? Defines.c_left : Defines.c_right);
         m_isSliding = IsSliding(m_owner.CollisionInfo, v);
 
         if(m_isSliding)
+        {
             v.y = Mathf.Max(v.y, m_slideMinSpeed);
+            m_owner.State = PlayerState.ClimbWall;
+        }
+        else
+        {
+            if (m_owner.State == PlayerState.ClimbWall)
+                m_owner.State = PlayerState.Normal;
+        }
 
-        if(m_isSliding && Input.GetKeyDown(KeyCode.Space))
+        if(m_isSliding && InputBuffer.Instance.JumpDown)
         {
             if (m_wallRelativeDir == input.x)
                 v = m_towardWallJumpVelocity;

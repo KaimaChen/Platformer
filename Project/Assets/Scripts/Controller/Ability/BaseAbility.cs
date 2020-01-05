@@ -9,5 +9,15 @@ public abstract class BaseAbility
         m_owner = owner;
     }
 
-    public abstract void Update(Vector2 input);
+    public void Update(Vector2 input)
+    {
+        if (CanUpdate() == false)
+            return;
+
+        UpdateImpl(input);
+    }
+
+    protected abstract bool CanUpdate();
+
+    protected abstract void UpdateImpl(Vector2 input);
 }

@@ -9,13 +9,13 @@ public class CameraFollow : MonoBehaviour
     /// 跟随的目标
     /// </summary>
     [SerializeField]
-    PlayerController m_target;
+    PlayerController m_target = null;
 
     /// <summary>
     /// 焦点与跟随目标的偏移值
     /// </summary>
     [SerializeField]
-    Vector2 m_offset;
+    Vector2 m_offset = Vector2.zero;
 
     /// <summary>
     /// 聚焦的范围
