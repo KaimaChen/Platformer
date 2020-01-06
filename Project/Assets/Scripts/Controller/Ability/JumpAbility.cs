@@ -60,7 +60,7 @@ public class JumpAbility : BaseAbility
     protected override bool CanUpdate()
     {
         return m_owner.State != PlayerState.Dash &&
-                    m_owner.State != PlayerState.ClimbWall;
+                    m_owner.State != PlayerState.SlideWall;
     }
 
     protected override void UpdateImpl(Vector2 input)

@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 
 /// <summary>
-/// 爬墙能力
+/// 滑墙能力（贴墙时会缓慢向下滑）
 /// </summary>
-public class ClimbWallAbility : BaseAbility
+public class SlideWallAbility : BaseAbility
 {
     /// <summary>
     /// 在不按朝着墙壁的方向键时，能在墙壁上坚持多久
@@ -35,7 +35,7 @@ public class ClimbWallAbility : BaseAbility
     int m_wallRelativeDir;
     float m_stickTimer;
 
-    public ClimbWallAbility(PlayerController owner) : base(owner) { }
+    public SlideWallAbility(PlayerController owner) : base(owner) { }
 
     protected override bool CanUpdate()
     {
@@ -51,9 +51,10 @@ public class ClimbWallAbility : BaseAbility
 
         if(m_isSliding)
         {
-            v.y = Mathf.Max(v.y, m_slideMinSpeed);
-            m_owner.State = PlayerState.ClimbWall;
+            v.y = Mathf.Max(v.y, m_slideMinSpeed); //滑墙速度应该比自由落体要慢
+            m_owner.State = PlayerState.SlideWall;
 
+            //贴墙要有个时间，否则很容易就会脱离墙壁导致贴墙跳失败
             float dirX = Mathf.Sign(input.x);
             if (dirX == m_wallRelativeDir)
             {
@@ -68,11 +69,24 @@ public class ClimbWallAbility : BaseAbility
         }
         else
         {
-            if (m_owner.State == PlayerState.ClimbWall)
+            if (m_owner.State == PlayerState.SlideWall)
                 m_owner.State = PlayerState.Normal;
         }
 
-        if(m_isSliding && InputBuffer.Instance.JumpDown)
+        HandleWallJump(input, ref v);
+
+        m_owner.Velocity = v;
+    }
+
+    bool IsSliding(CollisionInfo info, Vector2 velocity)
+    {
+        bool touchWall = info.m_left || info.m_right;
+        return (touchWall && !info.m_below && velocity.y < 0);
+    }
+
+    void HandleWallJump(Vector2 input, ref Vector2 v)
+    {
+        if (m_isSliding && InputBuffer.Instance.JumpDown)
         {
             if (m_wallRelativeDir == input.x)
                 v = m_towardWallJumpVelocity;
@@ -85,13 +99,5 @@ public class ClimbWallAbility : BaseAbility
 
             InputBuffer.Instance.ResetJump();
         }
-
-        m_owner.Velocity = v;
-    }
-
-    bool IsSliding(CollisionInfo info, Vector2 velocity)
-    {
-        bool touchWall = info.m_left || info.m_right;
-        return (touchWall && !info.m_below && velocity.y < 0);
     }
 }

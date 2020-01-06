@@ -15,6 +15,7 @@ public static class Defines
 
     #region Tags
     public const string c_tagOneWayPlatform = "OneWayPlatform";
+    public const string c_tagPlayer = "Player";
     #endregion
 }
 
@@ -27,7 +28,7 @@ public enum FaceDir
 public enum PlayerState
 {
     Normal,
-    ClimbWall,
+    SlideWall,
     Dash,
 }
 

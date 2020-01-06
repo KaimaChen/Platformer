@@ -22,7 +22,7 @@ public class PlayerController : Raycaster
     PlayerState m_state = PlayerState.Normal;
 
     JumpAbility m_jumpAbility;
-    ClimbWallAbility m_climbWallAbility;
+    SlideWallAbility m_slideWallAbility;
     DashAbility m_dashAbility;
 
     #region get-set
@@ -48,8 +48,10 @@ public class PlayerController : Raycaster
     {
         base.Start();
 
+        gameObject.tag = Defines.c_tagPlayer;
+
         m_jumpAbility = new JumpAbility(this, 2);
-        m_climbWallAbility = new ClimbWallAbility(this);
+        m_slideWallAbility = new SlideWallAbility(this);
         m_dashAbility = new DashAbility(this, 15, 0.4f, 1f);
     }
 
@@ -60,7 +62,7 @@ public class PlayerController : Raycaster
         CalcVelocityByInput(m_inputData);
 
         m_jumpAbility.Update(m_inputData);
-        m_climbWallAbility.Update(m_inputData);
+        m_slideWallAbility.Update(m_inputData);
         m_dashAbility.Update(m_inputData);
 
         Move(m_velocity * Time.deltaTime);
@@ -73,7 +75,7 @@ public class PlayerController : Raycaster
     private void OnGUI()
     {
         m_jumpAbility.OnGUI();
-        m_climbWallAbility.OnGUI();
+        m_slideWallAbility.OnGUI();
         m_dashAbility.OnGUI();
     }
 
