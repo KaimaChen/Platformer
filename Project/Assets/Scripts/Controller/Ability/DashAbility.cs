@@ -48,7 +48,7 @@ public class DashAbility : BaseAbility
     protected override void UpdateImpl(Vector2 input)
     {
         if(CanStartDash())
-            StartDash();
+            StartDash(input);
 
         if (IsDashing())
             Dash();
@@ -67,12 +67,23 @@ public class DashAbility : BaseAbility
         return true;
     }
 
-    void StartDash()
+    void StartDash(Vector2 input)
     {
         m_dashEndTime = Time.time + m_duration;
         m_cdEndTime = Time.time + m_cd;
-        m_dir = m_owner.FaceDir == FaceDir.Right ? 1 : -1;
         m_owner.State = PlayerState.Dash;
+
+        CalcDashDir(input);
+    }
+
+    void CalcDashDir(Vector2 input)
+    {
+        if (input.x > 0)
+            m_dir = 1;
+        else if (input.x < 0)
+            m_dir = -1;
+        else
+            m_dir = m_owner.FaceDir == FaceDir.Right ? 1 : -1;
     }
 
     void Dash()
