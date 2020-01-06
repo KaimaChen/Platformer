@@ -30,10 +30,11 @@ public class JumpAbility : BaseAbility
     int m_remainJumpCount;
 
     #region get-set
-    public int MaxJumpCount
-    {
-        set { m_maxJumpCount = value; }
-    }
+    public int MaxJumpCount { set { m_maxJumpCount = value; } }
+
+    public float MaxJumpVelocity { set { m_maxJumpVelocity = value; } }
+
+    public float MinJumpVelocity { set { m_minJumpVelocity = value; } }
     #endregion
 
     public JumpAbility(PlayerController owner, int maxJumpCount = 1)
@@ -45,18 +46,6 @@ public class JumpAbility : BaseAbility
         m_remainJumpCount = maxJumpCount;
     }
 
-    public override void OnGUI()
-    {
-        base.OnGUI();
-
-        GUIStyle style = new GUIStyle()
-        {
-            fontSize = 40
-        };
-
-        GUILayout.Label($"跳跃次数:{m_remainJumpCount}", style);
-    }
-
     protected override bool CanUpdate()
     {
         return m_owner.State != PlayerState.Dash &&
@@ -65,7 +54,7 @@ public class JumpAbility : BaseAbility
 
     protected override void UpdateImpl(Vector2 input)
     {
-        if (InputBuffer.Instance.JumpDown)
+        if (InputBuffer.Instance.UseJumpDown())
         {
             OnJumpKeyDown(input);
         }
@@ -79,14 +68,14 @@ public class JumpAbility : BaseAbility
     {
         if (m_owner.IsOnGround)
         {
-            if(input.y < 0)
+            if(input.y < 0) //向下键 + 跳跃 = 跳下单向平台
                 m_owner.FallThrough();
             else
                 Jump();
         }
-        else
+        else //空中跳跃
         {
-            if(m_remainJumpCount > 0)
+            if(m_remainJumpCount > 0) 
                 Jump();
         }
     }
@@ -102,13 +91,6 @@ public class JumpAbility : BaseAbility
         }
     }
 
-    void FallThrough()
-    {
-        m_owner.FallThrough();
-
-        InputBuffer.Instance.ResetJump();
-    }
-
     void Jump()
     {
         m_remainJumpCount--;
@@ -116,8 +98,6 @@ public class JumpAbility : BaseAbility
         Vector2 v = m_owner.Velocity;
         v.y = m_maxJumpVelocity;
         m_owner.Velocity = v;
-
-        InputBuffer.Instance.ResetJump();
     }
 
     void ResetJumpCount()

@@ -53,7 +53,7 @@ public class DashAbility : BaseAbility
         if (IsDashing())
             Dash();
         else
-            EndDash();
+            CheckEndDash();
     }
 
     bool CanStartDash()
@@ -91,15 +91,15 @@ public class DashAbility : BaseAbility
         m_owner.Velocity = new Vector2(m_speed * m_dir, 0);
     }
 
-    void EndDash()
+    void CheckEndDash()
     {
-        if (m_owner.State != PlayerState.Dash)
-            return;
+        if (m_owner.State == PlayerState.Dash)
+        {
+            m_owner.State = PlayerState.Normal;
+            m_owner.Velocity = Vector2.zero;
 
-        m_owner.State = PlayerState.Normal;
-        m_owner.Velocity = Vector2.zero;
-
-        m_dashEndTime = 0;
+            m_dashEndTime = 0;
+        }
     }
 
     bool IsDashing()

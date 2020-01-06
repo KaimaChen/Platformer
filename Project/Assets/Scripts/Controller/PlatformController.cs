@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(WaypointsMotor))]
@@ -43,32 +44,21 @@ public class PlatformController : Raycaster
         {
             float rayLength = Mathf.Abs(movement.y) + c_skinWidth;
 
-            for(int i = 0; i < m_verticalRayCount; i++)
+            void action(RaycastHit2D hit)
             {
-                Vector2 origin = GetVerticalBorder(dirY);
-                origin += Vector2.right * (m_verticalRayGaps * i);
-
-                Vector2 dir = Vector2.up * dirY;
-
-                Debug.DrawLine(origin, origin + dir * rayLength, Color.cyan);
-                RaycastHit2D hit = Physics2D.Raycast(origin, dir, rayLength, m_collisionMask);
-                if(hit && hit.distance != 0)
+                if (added.Add(hit.transform))
                 {
-                    if(added.Add(hit.transform))
-                    {
-                        Vector2 pos = hit.transform.position;
-                        Debug.DrawLine(pos, pos + dir, Color.cyan);
-                        
-                        float pushX = (dirY == Defines.c_top ? movement.x : 0);
-                        float pushY = movement.y - (hit.distance - c_skinWidth) * dirY;
-                        Vector2 m = new Vector2(pushX, pushY);
-                        bool isMovingUp = dirY == Defines.c_top;
+                    float pushX = (dirY == Defines.c_top ? movement.x : 0);
+                    float pushY = movement.y - (hit.distance - c_skinWidth) * dirY;
+                    Vector2 m = new Vector2(pushX, pushY);
+                    bool isMovingUp = dirY == Defines.c_top;
 
-                        Passenger p = new Passenger(hit.transform, m, isMovingUp, true);
-                        result.Add(p);
-                    }
+                    Passenger p = new Passenger(hit.transform, m, isMovingUp, true);
+                    result.Add(p);
                 }
             }
+
+            CheckRaycast(true, rayLength, dirY, action);
         }
 
         //水平方向移动
@@ -76,31 +66,20 @@ public class PlatformController : Raycaster
         {
             float rayLength = Mathf.Abs(movement.x) + c_skinWidth;
 
-            for(int i = 0; i < m_horizontalRayCount; i++)
+            void action(RaycastHit2D hit)
             {
-                Vector2 origin = GetHorizontalBorder(dirX);
-                origin += Vector2.up * (m_horizontalRayGaps * i);
-
-                Vector2 dir = Vector2.right * dirX;
-
-                Debug.DrawLine(origin, origin + dir * rayLength, Color.cyan);
-                RaycastHit2D hit = Physics2D.Raycast(origin, dir, rayLength, m_collisionMask);
-                if(hit && hit.distance != 0)
+                if (added.Add(hit.transform))
                 {
-                    if(added.Add(hit.transform))
-                    {
-                        Vector2 pos = hit.transform.position;
-                        Debug.DrawLine(pos, pos + dir, Color.cyan);
+                    float pushX = movement.x - (hit.distance - c_skinWidth) * dirX;
+                    float pushY = -c_skinWidth;
+                    Vector2 m = new Vector2(pushX, pushY);
 
-                        float pushX = movement.x - (hit.distance - c_skinWidth) * dirX;
-                        float pushY = -c_skinWidth;
-                        Vector2 m = new Vector2(pushX, pushY);
-
-                        Passenger p = new Passenger(hit.transform, m, false, true);
-                        result.Add(p);
-                    }
+                    Passenger p = new Passenger(hit.transform, m, false, true);
+                    result.Add(p);
                 }
             }
+
+            CheckRaycast(false, rayLength, dirX, action);
         }
 
         //乘客在水平移动或向下移动的平台上
@@ -108,28 +87,56 @@ public class PlatformController : Raycaster
         {
             float rayLength = c_skinWidth * 2;
 
-            for(int i = 0; i < m_verticalRayCount; i++)
+            void action(RaycastHit2D hit)
             {
-                Vector2 origin = GetVerticalBorder(Defines.c_top);
-                origin += Vector2.right * (m_verticalRayGaps * i);
-
-                Debug.DrawLine(origin, origin + Vector2.up * rayLength, Color.red);
-                RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.up, rayLength, m_collisionMask);
-                if(hit && hit.distance != 0)
+                if (added.Add(hit.transform))
                 {
-                    if(added.Add(hit.transform))
-                    {
-                        Vector2 pos = hit.transform.position;
-                        Debug.DrawLine(pos, pos + Vector2.up, Color.red);
-
-                        Passenger p = new Passenger(hit.transform, movement, true, false);
-                        result.Add(p);
-                    }
+                    Passenger p = new Passenger(hit.transform, movement, true, false);
+                    result.Add(p);
                 }
             }
+
+            CheckRaycast(true, rayLength, 1, action);
         }
 
         HashSetPool<Transform>.Release(ref added);
+    }
+
+    void CheckRaycast(bool isVertical, float rayLength, float dir, Action<RaycastHit2D> hitAction)
+    {
+        int rayCount;
+        float rayGaps;
+        Vector2 border;
+        Vector2 rayDir;
+        Vector2 axisDir;
+
+        if(isVertical)
+        {
+            rayCount = m_verticalRayCount;
+            rayGaps = m_verticalRayGaps;
+            border = GetVerticalBorder(dir);
+            rayDir = Vector2.up * dir;
+            axisDir = Vector2.right;
+        }
+        else
+        {
+            rayCount = m_horizontalRayCount;
+            rayGaps = m_horizontalRayGaps;
+            border = GetHorizontalBorder(dir);
+            rayDir = Vector2.right * dir;
+            axisDir = Vector2.up;
+        }
+
+        for(int i = 0; i < rayCount; i++)
+        {
+            Vector2 origin = border + axisDir * (rayGaps * i);
+
+            RaycastHit2D hit = Physics2D.Raycast(origin, rayDir, rayLength, m_collisionMask);
+            if(hit && hit.distance != 0)
+            {
+                hitAction(hit);
+            }
+        }
     }
 
     void MovePassengers(List<Passenger> passengers, bool moveBefore)

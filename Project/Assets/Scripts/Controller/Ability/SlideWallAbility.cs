@@ -12,6 +12,11 @@ public class SlideWallAbility : BaseAbility
     const float c_stickTime = 0.15f;
 
     /// <summary>
+    /// 贴墙下滑时的最小速度
+    /// </summary>
+    const float c_slideMinSpeed = -3;
+
+    /// <summary>
     /// 不按方向键时的贴墙跳跃速度
     /// </summary>
     Vector2 m_wallJumpVelocity = new Vector2(8, 8);
@@ -19,20 +24,14 @@ public class SlideWallAbility : BaseAbility
     /// <summary>
     /// 按下朝墙壁的方向键时的贴墙跳跃速度
     /// </summary>
-    Vector2 m_towardWallJumpVelocity = new Vector2(8, 16);
+    Vector2 m_towardWallJumpVelocity = new Vector2(10, 20);
 
     /// <summary>
     /// 按下远离墙壁的方向键时的贴墙跳跃速度
     /// </summary>
     Vector2 m_offWallJumpVelocity = new Vector2(16, 16);
 
-    /// <summary>
-    /// 贴墙下滑时的最小速度
-    /// </summary>
-    float m_slideMinSpeed = -3;
-
-    bool m_isSliding;
-    int m_wallRelativeDir;
+    int m_wallRelativeDir; //墙在角色的哪边
     float m_stickTimer;
 
     public SlideWallAbility(PlayerController owner) : base(owner) { }
@@ -46,12 +45,12 @@ public class SlideWallAbility : BaseAbility
     {
         Vector2 v = m_owner.Velocity;
 
-        m_wallRelativeDir = (m_owner.CollisionInfo.m_left ? Defines.c_left : Defines.c_right);
-        m_isSliding = IsSliding(m_owner.CollisionInfo, v);
-
-        if(m_isSliding)
+        bool isSliding = IsSliding(m_owner.CollisionInfo, v);
+        if(isSliding)
         {
-            v.y = Mathf.Max(v.y, m_slideMinSpeed); //滑墙速度应该比自由落体要慢
+            m_wallRelativeDir = (m_owner.CollisionInfo.m_left ? Defines.c_left : Defines.c_right);
+
+            v.y = Mathf.Max(v.y, c_slideMinSpeed); //滑墙速度应该比自由落体要慢
             m_owner.State = PlayerState.SlideWall;
 
             //贴墙要有个时间，否则很容易就会脱离墙壁导致贴墙跳失败
@@ -69,11 +68,10 @@ public class SlideWallAbility : BaseAbility
         }
         else
         {
-            if (m_owner.State == PlayerState.SlideWall)
-                m_owner.State = PlayerState.Normal;
+            CheckEndSlide();
         }
 
-        HandleWallJump(input, ref v);
+        HandleWallJump(isSliding, input, ref v);
 
         m_owner.Velocity = v;
     }
@@ -84,9 +82,9 @@ public class SlideWallAbility : BaseAbility
         return (touchWall && !info.m_below && velocity.y < 0);
     }
 
-    void HandleWallJump(Vector2 input, ref Vector2 v)
+    void HandleWallJump(bool isSliding, Vector2 input, ref Vector2 v)
     {
-        if (m_isSliding && InputBuffer.Instance.JumpDown)
+        if (isSliding && InputBuffer.Instance.UseJumpDown())
         {
             if (m_wallRelativeDir == input.x)
                 v = m_towardWallJumpVelocity;
@@ -96,8 +94,12 @@ public class SlideWallAbility : BaseAbility
                 v = m_offWallJumpVelocity;
 
             v.x *= -m_wallRelativeDir;
-
-            InputBuffer.Instance.ResetJump();
         }
+    }
+
+    void CheckEndSlide()
+    {
+        if (m_owner.State == PlayerState.SlideWall)
+            m_owner.State = PlayerState.Normal;
     }
 }

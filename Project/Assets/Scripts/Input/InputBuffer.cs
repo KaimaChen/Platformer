@@ -125,9 +125,18 @@ public class InputBuffer : MonoBehaviour
     /// <summary>
     /// 在使用了跳跃等之后要重置跳跃数据，否则会一直判定为按下导致连续跳跃
     /// </summary>
-    public void ResetJump()
+    public bool UseJumpDown()
     {
-        m_jumpDownEndTime = 0;
-        m_jumpData = GetKeyState(m_jump);
+        if(m_jumpData == KeyState.Down)
+        {
+            m_jumpDownEndTime = 0;
+            m_jumpData = GetKeyState(m_jump);
+
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 }
