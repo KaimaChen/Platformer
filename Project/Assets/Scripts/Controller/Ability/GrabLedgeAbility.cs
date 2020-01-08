@@ -3,6 +3,7 @@
 /// <summary>
 /// 抓住边缘的能力
 /// * 抓住边缘后就不会往下滑了
+/// * 按住向上键能往上移动直到停在平台上
 /// </summary>
 public class GrabLedgeAbility : BaseAbility
 {
@@ -75,8 +76,7 @@ public class GrabLedgeAbility : BaseAbility
             }
             else
             {
-                if (m_owner.State == State)
-                    m_owner.State = PlayerState.Normal;
+                SwitchStateTo(PlayerState.Normal);
             }
         }
     }
@@ -89,7 +89,7 @@ public class GrabLedgeAbility : BaseAbility
         //跳跃时就切回贴墙跳
         if(InputBuffer.Instance.JumpDown)
         {
-            m_owner.State = PlayerState.SlideWall;
+            SwitchStateTo(PlayerState.SlideWall);
             return;
         }
 

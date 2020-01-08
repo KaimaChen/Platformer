@@ -27,4 +27,10 @@ public abstract class BaseAbility
     protected abstract bool CanUpdate(Vector2 input);
 
     protected abstract void UpdateImpl(Vector2 input);
+
+    protected void SwitchStateTo(PlayerState nextState)
+    {
+        if (m_owner.State == State)
+            m_owner.State = nextState;
+    }
 }
