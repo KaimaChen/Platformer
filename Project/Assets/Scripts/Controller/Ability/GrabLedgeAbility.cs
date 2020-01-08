@@ -48,7 +48,7 @@ public class GrabLedgeAbility : BaseAbility
             return false;
 
         //如果已经处于抓边状态，则看看有没有落到边缘下边
-        if(State == PlayerState.GrabLedge)
+        if(m_owner.State == PlayerState.GrabLedge)
         {
             float distanceToLedge = m_owner.GetVerticalBorder(Defines.c_top).y - m_ledgeHeight;
             if (distanceToLedge < 0) //到边缘下边了
