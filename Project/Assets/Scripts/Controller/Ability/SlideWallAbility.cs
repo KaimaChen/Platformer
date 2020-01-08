@@ -12,11 +12,6 @@ public class SlideWallAbility : BaseAbility
     const float c_stickTime = 0.15f;
 
     /// <summary>
-    /// 贴墙下滑时的最小速度
-    /// </summary>
-    const float c_slideMinSpeed = -3;
-
-    /// <summary>
     /// 不按方向键时的贴墙跳跃速度
     /// </summary>
     Vector2 m_wallJumpVelocity = new Vector2(8, 8);
@@ -34,11 +29,13 @@ public class SlideWallAbility : BaseAbility
     int m_wallRelativeDir; //墙在角色的哪边
     float m_stickTimer;
 
+    protected override PlayerState State => PlayerState.SlideWall;
+
     public SlideWallAbility(PlayerController owner) : base(owner) { }
 
-    protected override bool CanUpdate()
+    protected override bool CanUpdate(Vector2 input)
     {
-        return m_owner.State != PlayerState.Dash;
+        return m_owner.State != PlayerState.Dash && m_owner.State != PlayerState.GrabLedge;
     }
 
     protected override void UpdateImpl(Vector2 input)
@@ -50,7 +47,7 @@ public class SlideWallAbility : BaseAbility
         {
             m_wallRelativeDir = (m_owner.CollisionInfo.m_left ? Defines.c_left : Defines.c_right);
 
-            v.y = Mathf.Max(v.y, c_slideMinSpeed); //滑墙速度应该比自由落体要慢
+            v.y = Mathf.Max(v.y, Defines.c_slideSpeed); //滑墙速度应该比自由落体要慢
             m_owner.State = PlayerState.SlideWall;
 
             //贴墙要有个时间，否则很容易就会脱离墙壁导致贴墙跳失败

@@ -25,6 +25,8 @@ public class DashAbility : BaseAbility
     int m_dir;
 
     #region get-set
+    protected override PlayerState State => PlayerState.Dash;
+
     public float Speed { set { m_speed = value; } }
 
     public float Duration { set { m_duration = value; } }
@@ -40,7 +42,7 @@ public class DashAbility : BaseAbility
         m_cd = cd;
     }
 
-    protected override bool CanUpdate()
+    protected override bool CanUpdate(Vector2 input)
     {
         return true;
     }

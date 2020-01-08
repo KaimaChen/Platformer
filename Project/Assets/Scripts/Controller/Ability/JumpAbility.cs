@@ -30,6 +30,8 @@ public class JumpAbility : BaseAbility
     int m_remainJumpCount;
 
     #region get-set
+    protected override PlayerState State => PlayerState.Normal;
+
     public int MaxJumpCount { set { m_maxJumpCount = value; } }
 
     public float MaxJumpVelocity { set { m_maxJumpVelocity = value; } }
@@ -46,10 +48,11 @@ public class JumpAbility : BaseAbility
         m_remainJumpCount = maxJumpCount;
     }
 
-    protected override bool CanUpdate()
+    protected override bool CanUpdate(Vector2 input)
     {
         return m_owner.State != PlayerState.Dash &&
-                    m_owner.State != PlayerState.SlideWall;
+                    m_owner.State != PlayerState.SlideWall &&
+                    m_owner.State != PlayerState.GrabLedge;
     }
 
     protected override void UpdateImpl(Vector2 input)

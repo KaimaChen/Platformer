@@ -8,6 +8,11 @@ public static class Defines
     /// </summary>
     public const float c_gravity = -50f;
 
+    /// <summary>
+    /// 贴墙下滑时的速度
+    /// </summary>
+    public const float c_slideSpeed = -3;
+
     public const int c_left = -1;
     public const int c_right = 1;
     public const int c_bottom = -1;
@@ -27,9 +32,10 @@ public enum FaceDir
 
 public enum PlayerState
 {
-    Normal,
-    SlideWall,
-    Dash,
+    Normal, //走路、跳跃等
+    SlideWall, //滑墙
+    Dash, //冲刺
+    GrabLedge, //抓住墙角
 }
 
 public enum KeyState

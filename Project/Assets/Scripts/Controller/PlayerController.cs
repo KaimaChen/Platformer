@@ -23,6 +23,7 @@ public class PlayerController : Raycaster
 
     JumpAbility m_jumpAbility;
     SlideWallAbility m_slideWallAbility;
+    GrabLedgeAbility m_grabLedgeAbility;
     DashAbility m_dashAbility;
 
     #region get-set
@@ -52,6 +53,7 @@ public class PlayerController : Raycaster
 
         m_jumpAbility = new JumpAbility(this, 2);
         m_slideWallAbility = new SlideWallAbility(this);
+        m_grabLedgeAbility = new GrabLedgeAbility(this);
         m_dashAbility = new DashAbility(this, 15, 0.4f, 1f);
     }
 
@@ -63,6 +65,7 @@ public class PlayerController : Raycaster
 
         m_jumpAbility.Update(m_inputData);
         m_slideWallAbility.Update(m_inputData);
+        m_grabLedgeAbility.Update(m_inputData);
         m_dashAbility.Update(m_inputData);
 
         Move(m_velocity * Time.deltaTime);

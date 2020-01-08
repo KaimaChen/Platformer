@@ -12,7 +12,7 @@ public class Raycaster : MonoBehaviour
     /// <summary>
     /// 皮肤厚度，会影响实际的射线长度
     /// </summary>
-    protected const float c_skinWidth = 0.015f;
+    public const float c_skinWidth = 0.015f;
 
     /// <summary>
     /// 隔多久重置m_isFallThroughOneWayPlatform状态
@@ -64,6 +64,8 @@ public class Raycaster : MonoBehaviour
     public BoxCollider2D Collider { get { return m_collider; } }
 
     public CollisionInfo CollisionInfo { get { return m_collisionInfo; } }
+
+    public LayerMask CollisionMask { get { return m_collisionMask; } }
 
     public FaceDir FaceDir { get { return m_faceDir; } }
 
@@ -200,7 +202,7 @@ public class Raycaster : MonoBehaviour
         m_isFallThroughOneWayPlatform = false;
     }
 
-    protected Vector2 GetHorizontalBorder(float dir)
+    public Vector2 GetHorizontalBorder(float dir)
     {
         Vector2 s = m_collider.bounds.size / 2;
         Vector2 pos = transform.position;
@@ -211,15 +213,15 @@ public class Raycaster : MonoBehaviour
             return new Vector2(pos.x + s.x, pos.y - s.y);
     }
 
-    protected Vector2 GetVerticalBorder(float dir)
+    public Vector2 GetVerticalBorder(float verticalDir, int horizontalSign = -1)
     {
         Vector2 s = m_collider.bounds.size / 2;
         Vector2 pos = transform.position;
 
-        if (dir == Defines.c_bottom)
-            return new Vector2(pos.x - s.x, pos.y - s.y);
+        if (verticalDir == Defines.c_bottom)
+            return new Vector2(pos.x + s.x * horizontalSign, pos.y - s.y);
         else
-            return new Vector2(pos.x - s.x, pos.y + s.y);
+            return new Vector2(pos.x + s.x * horizontalSign, pos.y + s.y);
     }
 }
 
