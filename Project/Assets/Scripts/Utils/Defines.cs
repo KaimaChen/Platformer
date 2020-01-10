@@ -22,6 +22,10 @@ public static class Defines
     public const string c_tagOneWayPlatform = "OneWayPlatform";
     public const string c_tagPlayer = "Player";
     #endregion
+
+    #region Layers
+    public const string c_layerLadder = "Ladder";
+    #endregion
 }
 
 public enum FaceDir
@@ -36,6 +40,7 @@ public enum PlayerState
     SlideWall, //滑墙
     Dash, //冲刺
     GrabLedge, //抓住墙角
+    ClimbLadder, //爬楼梯
 }
 
 public enum KeyState

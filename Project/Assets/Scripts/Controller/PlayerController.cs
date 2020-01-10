@@ -25,6 +25,7 @@ public class PlayerController : Raycaster
     ClimbWallAbility m_climbWallAbility;
     GrabLedgeAbility m_grabLedgeAbility;
     DashAbility m_dashAbility;
+    ClimbLadderAbility m_climbLadderAbility;
 
     #region get-set
     public Vector2 Velocity
@@ -55,6 +56,7 @@ public class PlayerController : Raycaster
         m_climbWallAbility = new ClimbWallAbility(this);
         m_grabLedgeAbility = new GrabLedgeAbility(this);
         m_dashAbility = new DashAbility(this, 15, 0.4f, 1f);
+        m_climbLadderAbility = new ClimbLadderAbility(this);
     }
 
     void Update()
@@ -67,6 +69,7 @@ public class PlayerController : Raycaster
         m_climbWallAbility.Update(m_inputData);
         m_grabLedgeAbility.Update(m_inputData);
         m_dashAbility.Update(m_inputData);
+        m_climbLadderAbility.Update(m_inputData);
 
         Move(m_velocity * Time.deltaTime);
 

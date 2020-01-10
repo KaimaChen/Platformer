@@ -52,7 +52,8 @@ public class JumpAbility : BaseAbility
     {
         return m_owner.State != PlayerState.Dash &&
                     m_owner.State != PlayerState.SlideWall &&
-                    m_owner.State != PlayerState.GrabLedge;
+                    m_owner.State != PlayerState.GrabLedge &&
+                    m_owner.State != PlayerState.ClimbLadder;
     }
 
     protected override void UpdateImpl(Vector2 input)
