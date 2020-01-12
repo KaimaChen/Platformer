@@ -56,7 +56,6 @@ public class WaypointsMotor : MonoBehaviour
         if (m_waypoints.Count <= 0)
             return Vector2.zero;
 
-        //TODO: 这种实现会导致端点处不是顺滑的
         Vector2 result;
         Vector2 curtPos = transform.position;
         Vector2 targetPos = m_waypoints.GetPoint(m_index);
@@ -81,7 +80,6 @@ public class WaypointsMotor : MonoBehaviour
 
     void UpdateIndex()
     {
-        //TODO：又丑又长，改一下
         if(m_descend)
         {
             m_index--;

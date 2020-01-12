@@ -1,7 +1,4 @@
 ﻿/*
- * 修改自：ta-david-yu/2D-Platformer-Hunter https://github.com/ta-david-yu/2D-Platformer-Hunter
- * 协议：MIT License   Copyright (c) 2019 Ta David Yu
- * 
  * 操作：
  * 1. 点击鼠标左键：添加点
  * 2. 拖动鼠标左键：移动选中的点

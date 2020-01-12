@@ -206,7 +206,7 @@ public class Raycaster : MonoBehaviour
     {
         m_isFallThroughOneWayPlatform = true;
 
-        Invoke("ResetData", c_resetThroughTime); //TODO: 感觉这样用时间来定时重置会有问题，比如玩家动作就是快，那么第二次跳平台就会发现跳不上去
+        Invoke("ResetData", c_resetThroughTime);
     }
 
     void ResetData()

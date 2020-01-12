@@ -2,23 +2,23 @@
 
 public static class HashSetPool<T>
 {
-    private static readonly ObjectPool<HashSet<T>> mObjectPool = new ObjectPool<HashSet<T>>(null, set => set.Clear());
+    private static readonly ObjectPool<HashSet<T>> m_pool = new ObjectPool<HashSet<T>>(null, set => set.Clear());
 
-    private static readonly object mLocker = new object();
+    private static readonly object m_locker = new object();
 
     public static HashSet<T> Get()
     {
-        lock(mLocker)
+        lock(m_locker)
         {
-            return mObjectPool.Get();
+            return m_pool.Get();
         }
     }
 
     public static void Release(ref HashSet<T> set)
     {
-        lock(mLocker)
+        lock(m_locker)
         {
-            mObjectPool.Release(set);
+            m_pool.Release(set);
             set = null;
         }
     }
