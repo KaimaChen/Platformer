@@ -34,6 +34,16 @@ public class PlayerController : Raycaster
         set { m_velocity = value; }
     }
 
+    public float VelocityX
+    {
+        set
+        {
+            Vector2 v = m_velocity;
+            v.x = 0;
+            m_velocity = v;
+        }
+    }
+
     public Vector2 InputData
     {
         get { return m_inputData; }

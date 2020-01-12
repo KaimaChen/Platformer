@@ -1,7 +1,5 @@
 ﻿using UnityEngine;
 
-//TODO: 站在单向平台上时按下键也要能够爬楼梯下去
-
 /// <summary>
 /// 爬楼梯
 /// 
@@ -17,6 +15,22 @@ public class ClimbLadderAbility : BaseAbility
     /// </summary>
     const float c_climbSpeed = 5f;
 
+    /// <summary>
+    /// 吸附到楼梯的速度
+    /// </summary>
+    const float c_snapSpeed = 1f;
+
+    /// <summary>
+    /// 大的吸附距离（在地面且按的是up）
+    /// </summary>
+    const float c_bigSnapDistance = 1f;
+    const float c_smallSnapDistance = c_bigSnapDistance / 2f;
+
+    /// <summary>
+    /// x方向小于等于该距离认为可以开始爬楼梯了
+    /// </summary>
+    const float c_validDistance = 0.02f;
+
     Collider2D m_ladder;
 
     protected override PlayerState State => PlayerState.ClimbLadder;
@@ -28,9 +42,11 @@ public class ClimbLadderAbility : BaseAbility
         if (m_owner.State != PlayerState.Normal && m_owner.State != PlayerState.ClimbLadder)
             return false;
 
-        if (input.y < 0 && m_owner.IsOnGround)
+        //在地上如果按的是down，则需要地面是单向平台才能下楼梯
+        if (input.y < 0 && m_owner.IsOnGround && !m_owner.IsOnOneWayPlatform)
             return false;
 
+        //按x方向会结束爬楼梯
         if (input.x != 0)
             return false;
 
@@ -51,7 +67,7 @@ public class ClimbLadderAbility : BaseAbility
         if (m_owner.State == PlayerState.ClimbLadder)
             Climb(input);
         else
-            GoToLadder(input);
+            SnapToLadder(input);
     }
 
     protected override void SwitchStateTo(PlayerState nextState)
@@ -75,6 +91,7 @@ public class ClimbLadderAbility : BaseAbility
         Vector2 v = Vector2.zero;
         if (input.y > 0)
         {
+            //角色中心不能超过楼梯顶部
             float distToTop = (m_ladder.bounds.max.y - m_owner.transform.position.y);
             float maxSpeed = distToTop / Time.deltaTime;
             v.y = Mathf.Min(c_climbSpeed, maxSpeed);
@@ -82,15 +99,13 @@ public class ClimbLadderAbility : BaseAbility
         else if(input.y < 0)
         {
             v.y = -c_climbSpeed;
-            m_owner.FallThrough();
+            m_owner.FallThrough(); //下楼梯时无视单向平台
         }
 
         m_owner.Velocity = v;
     }
 
-    //TODO: 吸附过去
-    //TODO: 向上键的吸附范围比向下键要大
-    void GoToLadder(Vector2 input)
+    void SnapToLadder(Vector2 input)
     {
         if (input.y == 0)
             return;
@@ -99,11 +114,57 @@ public class ClimbLadderAbility : BaseAbility
         m_ladder = Physics2D.OverlapBox(bounds.center, bounds.size, 0, LayerMask.GetMask(Defines.c_layerLadder));
         if (m_ladder != null)
         {
-            m_owner.State = PlayerState.ClimbLadder;
-
             Vector2 pos = m_owner.transform.position;
-            pos.x = m_ladder.transform.position.x;
-            m_owner.transform.position = pos;
+            Vector2 ladderPos = m_ladder.transform.position;
+            float deltaX = ladderPos.x - pos.x;
+            float absX = Mathf.Abs(deltaX);
+
+            if(absX <= GetSnapDistance(input))
+            {
+                if(absX > c_validDistance)
+                {
+                    float movement = m_owner.Velocity.x * Time.deltaTime;
+                    if(Mathf.Sign(movement) == Mathf.Sign(deltaX) && //如果移动经过了梯子，则直接可以爬
+                        Mathf.Abs(movement) > absX)
+                    {
+                        m_owner.State = PlayerState.ClimbLadder;
+                    }
+                    else
+                    {
+                        Vector2 v = m_owner.Velocity;
+                        v.x += c_snapSpeed * Mathf.Sign(deltaX);
+                        m_owner.Velocity = v;
+                    }
+                }
+                else
+                {
+                    m_owner.State = PlayerState.ClimbLadder;
+                }
+
+                if(m_owner.State == PlayerState.ClimbLadder)
+                {
+                    pos.x = m_ladder.transform.position.x;
+                    m_owner.transform.position = pos;
+                    m_owner.VelocityX = 0;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// 获取吸附距离（地面并且按向上键时吸附距离大，其他情况都时短距离）
+    /// </summary>
+    /// <param name="input">玩家当前帧输入</param>
+    /// <returns>吸附距离</returns>
+    float GetSnapDistance(Vector2 input)
+    {
+        if(m_owner.IsOnGround)
+        {
+            return input.y > 0 ? c_bigSnapDistance : c_smallSnapDistance;
+        }
+        else
+        {
+            return c_smallSnapDistance;
         }
     }
 }

@@ -269,7 +269,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u80FD\u529B\uFF1A\n1. \u591A\u91CD\u8DF3\u8DC3\n2. \u51B2\u523A\n3. \u722C\u5899"
+  m_Text: "\u80FD\u529B\uFF1A\n1. \u591A\u91CD\u8DF3\u8DC3\n2. \u51B2\u523A\n3. \u722C\u5899\n\n\u84DD\u8272\uFF1A\u5355\u5411\u5E73\u53F0\n\u8910\u8272\uFF1A\u666E\u901A\u5E73\u53F0\n\u7EFF\u8272\uFF1A\u4E3B\u89D2"
 --- !u!222 &45720936
 CanvasRenderer:
   m_ObjectHideFlags: 0

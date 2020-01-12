@@ -70,6 +70,15 @@ public class Raycaster : MonoBehaviour
     public FaceDir FaceDir { get { return m_faceDir; } }
 
     public bool IsOnGround { get { return m_collisionInfo.m_below; } }
+
+    public bool IsOnOneWayPlatform 
+    { 
+        get 
+        { 
+            return m_collisionInfo.m_belowObj != null 
+                && m_collisionInfo.m_belowObj.CompareTag(Defines.c_tagOneWayPlatform); 
+        } 
+    }
     #endregion
 
     protected virtual void Awake()
@@ -185,7 +194,10 @@ public class Raycaster : MonoBehaviour
                 m_collisionInfo.m_above = (dirY == Defines.c_top);
 
                 if (m_collisionInfo.m_below)
+                {
                     m_belowCollisionCB?.Invoke();
+                    m_collisionInfo.m_belowObj = hit.transform;
+                }
             }
         }
     }
@@ -228,9 +240,11 @@ public class Raycaster : MonoBehaviour
 public struct CollisionInfo
 {
     public bool m_above, m_below, m_left, m_right;
+    public Transform m_belowObj;
 
     public void Reset()
     {
         m_above = m_below = m_left = m_right = false;
+        m_belowObj = null;
     }
 }
