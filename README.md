@@ -1,4 +1,4 @@
-# Template-2dPlatformer
+# Platformer
 2d平台游戏模板，包含经典的要素
 
 ![](./Doc/Images/Demo.gif)
